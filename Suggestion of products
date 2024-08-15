@@ -1,0 +1,50 @@
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Sample dataset with objects and properties 
+# for now, I have added 3 properties for each object but we can add as many as we want
+data = {
+    "milk": ["white", "drink", "protein"],
+    "water": ["clear", "drink", "hydration"],
+    "banana": ["yellow", "fruit", "potassium"],
+    "apple": ["red", "fruit", "vitamin"],
+    "yogurt": ["white", "dairy", "protein"],
+    # We can add more objects and properties here
+}
+
+# Combine properties into a single description
+descriptions = [" ".join(properties) for properties in data.values()]
+
+# Initialize TfidfVectorizer
+vectorizer = TfidfVectorizer()
+vectors = vectorizer.fit_transform(descriptions)
+
+
+print("Welcome to the Object Suggester!")
+print("I can help you find an object based on the properties you provide.")
+print("Think about the object's color, category, or any other features.")
+
+# Collect user input 
+properties = []
+while True:
+    detail = input("Enter a property or type 'done' when you're finished: ")
+    if detail.lower() == 'done':
+        break
+    properties.append(detail)
+
+if properties:
+    # Convert user input into a space-separated string
+    user_query = [" ".join(properties)]
+    
+    # Transform user query into TF-IDF vector
+    user_vector = vectorizer.transform(user_query)
+    
+    # Compute cosine similarity between user query and objects
+    similarity = cosine_similarity(user_vector, vectors)
+    best_match_index = similarity.argmax()
+    
+    # Get the best match object
+    best_match_object = list(data.keys())[best_match_index]
+    print(f"Suggested object based on your input: {best_match_object}")
+else:
+    print("No properties were entered. Please try again and provide some details.")
